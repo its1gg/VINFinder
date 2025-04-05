@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VIN Lookup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4 text-center">Vehicle Info Lookup</h1>
+    <input
+      type="text"
+      id="vinInput"
+      placeholder="Enter VIN (رقم الشاصي)"
+      class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+    />
+    <button
+      onclick="lookupVIN()"
+      class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+    >
+      Get Info
+    </button>
+    <div id="result" class="mt-6 text-gray-700 text-sm"></div>
+  </div>
+
+  <script>
+    function lookupVIN() {
+      const vin = document.getElementById('vinInput').value.trim();
+      const resultDiv = document.getElementById('result');
+
+      if (!vin || vin.length < 5) {
+        resultDiv.innerHTML = '<span class="text-red-500">Please enter a valid VIN.</span>';
+        return;
+      }
+
+      // مثال وهمي (في المشروع الحقيقي يتم جلب البيانات من API)
+      const fakeData = {
+        '1234567890': {
+          make: 'Toyota',
+          model: 'Camry',
+          year: 2020,
+          color: 'White'
+        },
+        '9876543210': {
+          make: 'Ford',
+          model: 'Mustang',
+          year: 2018,
+          color: 'Red'
+        }
+      };
+
+      const data = fakeData[vin];
+
+      if (data) {
+        resultDiv.innerHTML = `
+          <div class="space-y-2">
+            <p><strong>Make:</strong> ${data.make}</p>
+            <p><strong>Model:</strong> ${data.model}</p>
+            <p><strong>Year:</strong> ${data.year}</p>
+            <p><strong>Color:</strong> ${data.color}</p>
+          </div>
+        `;
+      } else {
+        resultDiv.innerHTML = '<span class="text-yellow-600">No data found for this VIN.</span>';
+      }
+    }
+  </script>
+</body>
+</html>
