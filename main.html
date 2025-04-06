@@ -12,7 +12,7 @@
     <input
       type="text"
       id="vinInput"
-      placeholder="Enter VIN (رقم الشاصي)"
+      placeholder="Enter VIN (مثال: 1HGCM82633A004352)"
       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
     />
     <button
@@ -25,44 +25,38 @@
   </div>
 
   <script>
-    function lookupVIN() {
+    async function lookupVIN() {
       const vin = document.getElementById('vinInput').value.trim();
       const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = 'Loading...';
 
       if (!vin || vin.length < 5) {
         resultDiv.innerHTML = '<span class="text-red-500">Please enter a valid VIN.</span>';
         return;
       }
 
-      // مثال وهمي (في المشروع الحقيقي يتم جلب البيانات من API)
-      const fakeData = {
-        '1234567890': {
-          make: 'Toyota',
-          model: 'Camry',
-          year: 2020,
-          color: 'White'
-        },
-        '9876543210': {
-          make: 'Ford',
-          model: 'Mustang',
-          year: 2018,
-          color: 'Red'
+      try {
+        const response = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/${vin}?format=json`);
+        const data = await response.json();
+        const result = data.Results[0];
+
+        if (!result || !result.Make) {
+          resultDiv.innerHTML = '<span class="text-yellow-600">No data found for this VIN.</span>';
+          return;
         }
-      };
 
-      const data = fakeData[vin];
-
-      if (data) {
         resultDiv.innerHTML = `
           <div class="space-y-2">
-            <p><strong>Make:</strong> ${data.make}</p>
-            <p><strong>Model:</strong> ${data.model}</p>
-            <p><strong>Year:</strong> ${data.year}</p>
-            <p><strong>Color:</strong> ${data.color}</p>
+            <p><strong>Make:</strong> ${result.Make}</p>
+            <p><strong>Model:</strong> ${result.Model}</p>
+            <p><strong>Year:</strong> ${result.ModelYear}</p>
+            <p><strong>Vehicle Type:</strong> ${result.VehicleType}</p>
+            <p><strong>Plant Country:</strong> ${result.PlantCountry}</p>
           </div>
         `;
-      } else {
-        resultDiv.innerHTML = '<span class="text-yellow-600">No data found for this VIN.</span>';
+      } catch (error) {
+        console.error(error);
+        resultDiv.innerHTML = '<span class="text-red-500">Error retrieving data.</span>';
       }
     }
   </script>
